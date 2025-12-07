@@ -34,12 +34,22 @@ export function useAuth(
     }
   };
 
-  const signUp = async (email: string, password: string, name?: string) => {
+  const signUp = async (
+    username: string,
+    email: string,
+    password: string,
+    confirmPassword: string
+  ) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const session = await signUpUseCase.execute(email, password, name);
+      const session = await signUpUseCase.execute(
+        username,
+        email,
+        password,
+        confirmPassword
+      );
       setUser(session.user);
       return session;
     } catch (err) {
