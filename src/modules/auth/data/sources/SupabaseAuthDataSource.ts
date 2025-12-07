@@ -8,14 +8,20 @@ import { UserModel } from "../models";
 export class SupabaseAuthDataSource {
   constructor(private supabase: SupabaseClient) {}
 
-  async signUp(email: string, password: string, name?: string) {
+  // Sign up user with email verification OTP
+  // Username is stored in metadata and synced to users table via trigger
+  async signUp(email: string, password: string, username?: string) {
     const { data, error } = await this.supabase.auth.signUp({
       email,
       password,
       options: {
+        // Store username in user metadata - will be synced to public.users table
         data: {
-          name,
+          username,
+          name: username,
         },
+        // Email confirmation required - Supabase sends OTP automatically
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
 
@@ -58,15 +64,32 @@ export class SupabaseAuthDataSource {
     return session;
   }
 
+  // Send password reset OTP to email
+  // User will receive email with link containing OTP token
   async resetPassword(email: string) {
-    const { error } = await this.supabase.auth.resetPasswordForEmail(email);
+    const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
+    });
     if (error) throw error;
   }
 
+  // Update password after OTP verification
+  // Called after user clicks reset link from email
   async updatePassword(newPassword: string) {
     const { error } = await this.supabase.auth.updateUser({
       password: newPassword,
     });
+    if (error) throw error;
+  }
+
+  // Update username in public.users table
+  // RLS policy allows users to update their own data
+  async updateUsername(userId: string, username: string) {
+    const { error } = await this.supabase
+      .from("users")
+      .update({ username })
+      .eq("id", userId);
+
     if (error) throw error;
   }
 
