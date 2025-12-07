@@ -5,7 +5,8 @@
       "Bash(npm uninstall:*)",
       "Bash(dir:*)",
       "Bash(find:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npx shadcn@latest add:*)"
     ],
     "deny": [],
     "ask": []
