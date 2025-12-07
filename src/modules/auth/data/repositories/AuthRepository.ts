@@ -17,11 +17,10 @@ export class AuthRepository implements IAuthRepository {
   ): Promise<UserSession> {
     const authData = await this.dataSource.signUp(email, password, name);
 
-    if (!authData.user || !authData.session) {
+    // User exists but session is null when email confirmation is required
+    if (!authData.user) {
       throw new Error("Sign up failed");
     }
-
-    const userProfile = await this.dataSource.getUserProfile(authData.user.id);
 
     const user: User = {
       id: authData.user.id,
@@ -31,6 +30,16 @@ export class AuthRepository implements IAuthRepository {
       createdAt: authData.user.created_at,
       updatedAt: authData.user.updated_at || authData.user.created_at,
     };
+
+    // Session will be null until email is confirmed
+    if (!authData.session) {
+      return {
+        user,
+        accessToken: "",
+        refreshToken: "",
+        expiresAt: "",
+      };
+    }
 
     return {
       user,
