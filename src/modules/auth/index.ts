@@ -5,7 +5,7 @@
 
 // Domain
 export * from "./domain/entities";
-export * from "./domain/repositories";
+export { type IAuthRepository, type AuthProvider as AuthProviderType } from "./domain/repositories";
 export * from "./domain/usecases";
 
 // Data
