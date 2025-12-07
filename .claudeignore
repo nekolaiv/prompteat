@@ -1,0 +1,102 @@
+# .claudeignore
+# This file tells Claude Code which files and directories to ignore
+# Ignore everything that won't be modified during development
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Cache and temp files
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
+
+# Testing
+coverage/
+.nyc_output/
+*.test.ts.snap
+*.spec.ts.snap
+
+# Environment files (keep structure but ignore values)
+.env*.local
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE settings
+.vscode/
+.idea/
+*.sublime-*
+.project
+.classpath
+.settings/
+
+# Git
+.git/
+.gitattributes
+
+# Static assets that don't need modification
+public/next.svg
+public/vercel.svg
+public/file.svg
+public/globe.svg
+public/window.svg
+*.ico
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.webp
+*.woff
+*.woff2
+*.ttf
+*.eot
+
+# Config files that rarely change
+next.config.ts
+postcss.config.mjs
+eslint.config.mjs
+tsconfig.json
+components.json
+.gitignore
+
+# Documentation
+LICENSE
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+
+# Lock files and package manager specific
+.yarn/
+.pnpm-store/
+
+# Storybook
+.storybook/
+storybook-static/
+
+# Misc
+*.bak
+*.tmp
+.cache/
+z_ignore/
