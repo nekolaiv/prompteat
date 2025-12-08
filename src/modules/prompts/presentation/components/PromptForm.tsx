@@ -25,7 +25,7 @@ export function PromptForm({ userId, categories, onSubmit, isLoading, initialDat
     content: initialData?.content || "",
     categoryId: initialData?.categoryId || "",
     visibility: (initialData?.visibility || "private") as "private" | "unlisted" | "public",
-    status: (initialData?.status || "draft") as "draft" | "published",
+    status: (initialData?.status === "archived" ? "draft" : initialData?.status || "draft") as "draft" | "published",
   });
   const [error, setError] = useState("");
 
@@ -37,7 +37,7 @@ export function PromptForm({ userId, categories, onSubmit, isLoading, initialDat
         content: initialData.content,
         categoryId: initialData.categoryId || "",
         visibility: initialData.visibility,
-        status: initialData.status,
+        status: initialData.status === "archived" ? "draft" : initialData.status,
       });
     }
   }, [initialData]);

@@ -42,7 +42,7 @@ export function PromptFormEnhanced({ userId, categories, onSubmit, isLoading, in
         description: initialData.description || "",
         categoryId: initialData.categoryId || "",
         visibility: initialData.visibility,
-        status: initialData.status,
+        status: initialData.status === "archived" ? "draft" : initialData.status,
       });
 
       const framework = initialData.framework || "FREEFORM";
