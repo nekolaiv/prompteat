@@ -1,4 +1,4 @@
-import { Prompt } from "../entities";
+import { Prompt, FrameworkType } from "../entities";
 import { UUID } from "@/shared/types";
 
 /**
@@ -28,6 +28,8 @@ export interface CreatePromptDTO {
   title: string;
   description?: string;
   content: string;
+  framework?: FrameworkType;
+  frameworkData?: Record<string, string>;
   visibility?: "public" | "private" | "unlisted";
   status?: "draft" | "published";
 }
@@ -36,6 +38,8 @@ export interface UpdatePromptDTO {
   title?: string;
   description?: string;
   content?: string;
+  framework?: FrameworkType;
+  frameworkData?: Record<string, string>;
   categoryId?: UUID;
   visibility?: "public" | "private" | "unlisted";
   status?: "draft" | "published";

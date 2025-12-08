@@ -23,20 +23,44 @@ interface PromptFormEnhancedProps {
 
 export function PromptFormEnhanced({ userId, categories, onSubmit, isLoading, initialData, mode = "create" }: PromptFormEnhancedProps) {
   const router = useRouter();
-  const [selectedFramework, setSelectedFramework] = useState<FrameworkType>(initialData?.framework || "FREEFORM");
+  const [selectedFramework, setSelectedFramework] = useState<FrameworkType>("FREEFORM");
   const [formData, setFormData] = useState({
-    title: initialData?.title || "",
-    description: initialData?.description || "",
-    categoryId: initialData?.categoryId || "",
-    visibility: (initialData?.visibility || "private") as "private" | "unlisted" | "public",
-    status: (initialData?.status || "draft") as "draft" | "published",
+    title: "",
+    description: "",
+    categoryId: "",
+    visibility: "private" as "private" | "unlisted" | "public",
+    status: "draft" as "draft" | "published",
   });
-  const [frameworkFields, setFrameworkFields] = useState<Record<string, string>>(initialData?.frameworkData || {});
+  const [frameworkFields, setFrameworkFields] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
 
+  // Load initial data when component mounts or initialData changes
   useEffect(() => {
-    if (initialData?.frameworkData) {
-      setFrameworkFields(initialData.frameworkData);
+    if (initialData) {
+      setFormData({
+        title: initialData.title,
+        description: initialData.description || "",
+        categoryId: initialData.categoryId || "",
+        visibility: initialData.visibility,
+        status: initialData.status,
+      });
+
+      const framework = initialData.framework || "FREEFORM";
+      setSelectedFramework(framework);
+
+      // If frameworkData exists, use it; otherwise fall back to content field for legacy prompts
+      if (initialData.frameworkData && Object.keys(initialData.frameworkData).length > 0) {
+        setFrameworkFields(initialData.frameworkData);
+      } else {
+        // Legacy prompt: parse content or just put it in the appropriate field
+        if (framework === "FREEFORM") {
+          setFrameworkFields({ content: initialData.content });
+        } else {
+          // For structured frameworks, put content in first field as fallback
+          const firstFieldKey = FRAMEWORKS[framework].fields[0]?.key || "content";
+          setFrameworkFields({ [firstFieldKey]: initialData.content });
+        }
+      }
     }
   }, [initialData]);
 
@@ -93,6 +117,8 @@ export function PromptFormEnhanced({ userId, categories, onSubmit, isLoading, in
         title: formData.title,
         description: formData.description || undefined,
         content,
+        framework: selectedFramework,
+        frameworkData: frameworkFields,
         categoryId: formData.categoryId || undefined,
         visibility: formData.visibility,
         status: publishNow ? "published" as const : formData.status,

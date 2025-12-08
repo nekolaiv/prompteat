@@ -11,6 +11,8 @@ export interface PromptModel {
   slug: string;
   description: string | null;
   content: string;
+  framework: string | null;
+  framework_data: any; // JSONB field for structured framework data
   variables: any; // JSONB field from database
   visibility: string;
   status: string;
@@ -38,6 +40,8 @@ export function toDomainPrompt(model: PromptModel): Prompt {
     slug: model.slug,
     description: model.description || undefined,
     content: model.content,
+    framework: model.framework as any,
+    frameworkData: model.framework_data || undefined,
     variables: Array.isArray(model.variables) ? model.variables : [],
     visibility: model.visibility as any,
     status: model.status as any,
@@ -64,6 +68,8 @@ export function toPromptModel(prompt: Partial<Prompt>): Partial<PromptModel> {
     title: prompt.title,
     description: prompt.description || null,
     content: prompt.content,
+    framework: prompt.framework || null,
+    framework_data: prompt.frameworkData || null,
     variables: prompt.variables || [],
     visibility: prompt.visibility,
     status: prompt.status,
