@@ -1,4 +1,5 @@
 import { UUID, Timestamp } from "@/shared/types";
+import { FrameworkType } from "./PromptFramework";
 
 /**
  * Prompt entity - Core domain model for prompt management
@@ -11,6 +12,8 @@ export interface Prompt {
   slug: string;
   description?: string;
   content: string;
+  framework?: FrameworkType;
+  frameworkData?: Record<string, string>;
   variables: PromptVariable[];
   visibility: PromptVisibility;
   status: PromptStatus;

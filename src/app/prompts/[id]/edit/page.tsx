@@ -11,7 +11,7 @@ import { SupabasePromptDataSource } from "@/modules/prompts/data/sources";
 import { PromptRepository } from "@/modules/prompts/data/repositories";
 import { ArrowLeft } from "lucide-react";
 import { useAuthContext } from "@/modules/auth/presentation/components";
-import { PromptForm } from "@/modules/prompts/presentation/components/PromptForm";
+import { PromptFormEnhanced } from "@/modules/prompts/presentation/components/PromptFormEnhanced";
 import { usePrompt } from "@/modules/prompts/presentation/hooks/usePrompt";
 import { useCategories } from "@/modules/prompts/presentation/hooks/useCategories";
 import { UpdatePromptDTO } from "@/modules/prompts/domain/repositories";
@@ -104,28 +104,14 @@ export default function EditPromptPage() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
       <Header />
-      <main className="container mx-auto px-4 py-8 max-w-3xl">
-        <div className="space-y-6">
-          <Button variant="ghost" onClick={() => router.back()} className="mb-4">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Edit Prompt</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <PromptForm
-                categories={categories}
-                onSubmit={handleSubmit}
-                isLoading={updating}
-                initialData={prompt}
-                mode="edit"
-              />
-            </CardContent>
-          </Card>
-        </div>
+      <main className="container mx-auto px-4 py-8 max-w-5xl">
+        <PromptFormEnhanced
+          categories={categories}
+          onSubmit={handleSubmit}
+          isLoading={updating}
+          initialData={prompt}
+          mode="edit"
+        />
       </main>
     </div>
   );
