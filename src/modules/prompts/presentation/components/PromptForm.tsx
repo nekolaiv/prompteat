@@ -1,46 +1,72 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Category } from "../../domain/entities";
-import { CreatePromptDTO } from "../../domain/repositories";
+import { Category, Prompt } from "../../domain/entities";
+import { CreatePromptDTO, UpdatePromptDTO } from "../../domain/repositories";
 
 interface PromptFormProps {
-  userId: string;
+  userId?: string;
   categories: Category[];
-  onSubmit: (data: CreatePromptDTO) => Promise<void>;
+  onSubmit: (data: CreatePromptDTO | UpdatePromptDTO) => Promise<void>;
   isLoading?: boolean;
+  initialData?: Prompt;
+  mode?: "create" | "edit";
 }
 
-export function PromptForm({ userId, categories, onSubmit, isLoading }: PromptFormProps) {
+export function PromptForm({ userId, categories, onSubmit, isLoading, initialData, mode = "create" }: PromptFormProps) {
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    content: "",
-    categoryId: "",
-    visibility: "private" as const,
-    status: "draft" as const,
+    title: initialData?.title || "",
+    description: initialData?.description || "",
+    content: initialData?.content || "",
+    categoryId: initialData?.categoryId || "",
+    visibility: (initialData?.visibility || "private") as "private" | "unlisted" | "public",
+    status: (initialData?.status || "draft") as "draft" | "published",
   });
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        title: initialData.title,
+        description: initialData.description || "",
+        content: initialData.content,
+        categoryId: initialData.categoryId || "",
+        visibility: initialData.visibility,
+        status: initialData.status,
+      });
+    }
+  }, [initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     try {
-      await onSubmit({
-        userId,
-        title: formData.title,
-        description: formData.description || undefined,
-        content: formData.content,
-        categoryId: formData.categoryId || undefined,
-        visibility: formData.visibility,
-        status: formData.status,
-      });
+      if (mode === "edit") {
+        await onSubmit({
+          title: formData.title,
+          description: formData.description || undefined,
+          content: formData.content,
+          categoryId: formData.categoryId || undefined,
+          visibility: formData.visibility,
+          status: formData.status,
+        });
+      } else {
+        await onSubmit({
+          userId: userId!,
+          title: formData.title,
+          description: formData.description || undefined,
+          content: formData.content,
+          categoryId: formData.categoryId || undefined,
+          visibility: formData.visibility,
+          status: formData.status,
+        });
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save prompt");
     }
@@ -134,7 +160,7 @@ export function PromptForm({ userId, categories, onSubmit, isLoading }: PromptFo
 
       <div className="flex gap-4">
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Saving..." : "Save as Draft"}
+          {isLoading ? "Saving..." : mode === "edit" ? "Update Draft" : "Save as Draft"}
         </Button>
         <Button
           type="button"
@@ -145,7 +171,7 @@ export function PromptForm({ userId, categories, onSubmit, isLoading }: PromptFo
             handleSubmit(new Event("submit") as any);
           }}
         >
-          Publish
+          {mode === "edit" ? "Update & Publish" : "Publish"}
         </Button>
       </div>
     </form>

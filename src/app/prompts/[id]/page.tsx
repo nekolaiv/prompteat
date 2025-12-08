@@ -9,8 +9,9 @@ import { Prompt } from "@/modules/prompts/domain/entities";
 import { createClientComponentClient } from "@/shared/config/supabase-client";
 import { SupabasePromptDataSource } from "@/modules/prompts/data/sources";
 import { PromptRepository } from "@/modules/prompts/data/repositories";
-import { Eye, Copy, Heart, ArrowLeft, Share2 } from "lucide-react";
+import { Eye, Copy, Heart, ArrowLeft, Share2, Trash2 } from "lucide-react";
 import { useAuthContext } from "@/modules/auth/presentation/components";
+import { usePrompt } from "@/modules/prompts/presentation/hooks/usePrompt";
 
 export default function PromptDetailPage() {
   const params = useParams();
@@ -20,6 +21,8 @@ export default function PromptDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const { deletePrompt, isLoading: deleting } = usePrompt();
 
   useEffect(() => {
     const fetchPrompt = async () => {
@@ -65,6 +68,15 @@ export default function PromptDetailPage() {
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("Failed to copy:", err);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!prompt) return;
+
+    const confirmed = await deletePrompt(prompt.id);
+    if (confirmed) {
+      router.push("/dashboard/prompts");
     }
   };
 
@@ -193,9 +205,20 @@ export default function PromptDetailPage() {
                   {copied ? "Copied!" : "Copy Prompt"}
                 </Button>
                 {user && user.id === prompt.userId && (
-                  <Button variant="outline" onClick={() => router.push(`/prompts/${prompt.id}/edit`)}>
-                    Edit
-                  </Button>
+                  <>
+                    <Button variant="outline" onClick={() => router.push(`/prompts/${prompt.id}/edit`)}>
+                      Edit
+                    </Button>
+                    {!showDeleteConfirm ? (
+                      <Button variant="destructive" onClick={() => setShowDeleteConfirm(true)} disabled={deleting}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    ) : (
+                      <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
+                        {deleting ? "Deleting..." : "Confirm Delete"}
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
             </CardContent>
