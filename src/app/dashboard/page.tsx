@@ -7,10 +7,14 @@ import { useEffect } from "react";
 import { Folder, Heart, FileText, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { usePrompts } from "@/modules/prompts/presentation/hooks/usePrompts";
+import { PromptCard } from "@/modules/prompts/presentation/components/PromptCard";
 
 export default function DashboardPage() {
   const { user, isLoading } = useAuthContext();
   const router = useRouter();
+  const { prompts, isLoading: promptsLoading } = usePrompts(user?.id);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -40,9 +44,11 @@ export default function DashboardPage() {
               <h1 className="text-3xl font-bold">Welcome back, {user.name || "User"}!</h1>
               <p className="text-muted-foreground mt-1">Manage your prompts and collections</p>
             </div>
-            <Button size="lg">
-              <Plus className="mr-2 h-5 w-5" />
-              New Prompt
+            <Button size="lg" asChild>
+              <Link href="/prompts/new">
+                <Plus className="mr-2 h-5 w-5" />
+                New Prompt
+              </Link>
             </Button>
           </div>
 
@@ -50,8 +56,8 @@ export default function DashboardPage() {
             <StatsCard
               icon={<FileText className="h-6 w-6 text-blue-500" />}
               title="Total Prompts"
-              value="0"
-              description="Create your first prompt"
+              value={prompts.length.toString()}
+              description={prompts.length === 0 ? "Create your first prompt" : "Your prompts"}
             />
             <StatsCard
               icon={<Folder className="h-6 w-6 text-green-500" />}
@@ -73,11 +79,25 @@ export default function DashboardPage() {
               <CardDescription>Your recently created prompts will appear here</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <FileText className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                <p className="text-muted-foreground mb-4">No prompts yet</p>
-                <Button>Create Your First Prompt</Button>
-              </div>
+              {promptsLoading ? (
+                <div className="flex justify-center py-12">
+                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                </div>
+              ) : prompts.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <FileText className="h-12 w-12 text-muted-foreground/50 mb-4" />
+                  <p className="text-muted-foreground mb-4">No prompts yet</p>
+                  <Button asChild>
+                    <Link href="/prompts/new">Create Your First Prompt</Link>
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {prompts.slice(0, 6).map((prompt) => (
+                    <PromptCard key={prompt.id} prompt={prompt} />
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
